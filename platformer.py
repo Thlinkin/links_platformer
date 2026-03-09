@@ -26,7 +26,8 @@ CAMERA_SLACK_Y = int(WIN_HEIGHT / 5)
 
 def my_print(message):
     if False:
-        print message
+        print
+        message
 
 
 def main():
@@ -57,7 +58,6 @@ def main():
     SOUND_DIE = pygame.mixer.Sound(SOUND_DIE_FILE)
     SOUND_PIT_DIE = pygame.mixer.Sound(SOUND_PIT_DIE_FILE)
     SOUND_PORTAL = pygame.mixer.Sound(SOUND_PORTAL_FILE)
-
 
     # TODO show_start_screen
     instructions_message()
@@ -176,9 +176,11 @@ def run_game(levels, start_level_num):
             TIMER.tick(60)
 
             for e in pygame.event.get():
-                if e.type == QUIT: raise SystemExit, "QUIT"
+                if e.type == QUIT:
+                    raise SystemExit("QUIT")
+
                 if e.type == KEYDOWN and e.key == K_ESCAPE:
-                    raise SystemExit, "ESCAPE"
+                    raise SystemExit("ESCAPE")
                 if e.type == KEYDOWN and e.key == K_F5:
                     return
                 if e.type == KEYDOWN and (e.key == K_UP or e.key == K_SPACE):
@@ -231,9 +233,9 @@ def run_game(levels, start_level_num):
                 end_game_message(screen, TIMER, bg)
                 my_print("No lives left. Game over!")
                 pygame.event.get()  # clear out event queue
-                return                                                         
+                return
 
-            # camera movement
+                # camera movement
             for entity in entities:
                 if isinstance(entity, Platform):
                     entity.update(cameraX, cameraY)
@@ -243,7 +245,6 @@ def run_game(levels, start_level_num):
 
             # draw text
             if not player.running_level:
-
                 SOUND_LIFE.stop()
                 SOUND_STICKY_MOVE.stop()
                 SOUND_STICKY_ON.stop()
@@ -274,7 +275,8 @@ def run_game(levels, start_level_num):
         this_level_time = elapsed_time(level_start_time)
         get_one_up = this_level_time < level.fast_time
         player.all_previous_level_times = player.all_previous_level_times + this_level_time
-        print "Finished level {}, total playing time = {:3.1f}".format(level_number + 1, player.all_previous_level_times)
+        print
+        "Finished level {}, total playing time = {:3.1f}".format(level_number + 1, player.all_previous_level_times)
 
         message_big = "Finished level: time = {:3.1f}".format(this_level_time)
         message_small = ["total time = {:3.1f}".format(player.all_previous_level_times),
@@ -286,10 +288,11 @@ def run_game(levels, start_level_num):
         end_message(message_life, message_big, message_small, TIMER, screen, bg, player.hp)
 
         if level_number + 1 == num_levels:
-            print "You win!!!!!!"
+            print
+            "You win!!!!!!"
             message_big = "You WIN!!!!!!!"
             message_small = ["total time = {:3.1f}".format(player.all_previous_level_times),
-                             "playing {} out of {} levels".format(num_levels-start_level_num, num_levels),
+                             "playing {} out of {} levels".format(num_levels - start_level_num, num_levels),
                              "press spacebar to play again!",
                              "press escape to terminate the game."]
             end_message(message_life, message_big, message_small, TIMER, screen, bg, player.hp)
@@ -356,7 +359,7 @@ class Player(Entity):
         if up:
             # only jump if on the ground
             if self.onSticky:
-                self.is_jumping = True      # This is counter intuitive, but allows the slide up off the stickies.
+                self.is_jumping = True  # This is counter intuitive, but allows the slide up off the stickies.
                 self.yvel = self.yvel - 0.65
                 # SOUND_STICKY_MOVE.play()
             elif (self.onGround or self.is_flying) and self.up_was_released:
@@ -411,25 +414,26 @@ class Player(Entity):
             self.yvel += GRAVITY
             if not self.is_jumping and self.yvel < 0:
                 # This allows you to have big and little jumps depending on how long you hold up.
-                self.yvel += 1.3*GRAVITY
+                self.yvel += 1.3 * GRAVITY
             # max falling speed
             if self.yvel > 90:
                 self.yvel = 90
-        if self.onGround and not(left or right) and not self.onIce:
+        if self.onGround and not (left or right) and not self.onIce:
             # this will let you change direction quickly but not immediately
-            self.xvel = self.xvel*.2
+            self.xvel = self.xvel * .2
             if abs(self.xvel) < 0.2:
                 self.xvel = 0.
 
         # only move up or down on stickies when you press up or down.
-        if self.onSticky and not(up or down):
+        if self.onSticky and not (up or down):
             self.yvel = 0
 
         # give the player a little help... let them fight the groundspeed if they jump
         # if they are actively pushing in the opposite direction of the carpet, lessen the effect of the carpet
         # by shrinking the groundspeed
-        if not self.onGround and cmp(self.xvel, 0) != cmp(self.groundSpeed, 0) and (left or right): 
-                self.groundSpeed *= 0.975
+        if not self.onGround and ((self.xvel > 0) - (self.xvel < 0)) != (
+                (self.groundSpeed > 0) - (self.groundSpeed < 0)) and (left or right):
+            self.groundSpeed *= 0.975
 
         # increment in x direction
         self.rect.left += self.xvel + self.groundSpeed
@@ -618,7 +622,7 @@ class Player(Entity):
                         else:
                             self.last_bounce_time = current_time()
 
-                        if self.yvel > -3*GRAVITY:
+                        if self.yvel > -3 * GRAVITY:
                             self.yvel = 0.0
                             self.is_jumping = False
                             self.onGround = True
@@ -792,8 +796,8 @@ class Player(Entity):
                     self.onSticky = True
 
                     # See if only collided/overlapped by 1
-                    if self.rect.right == p.rect.left + 1 or self.rect.left == p.rect.right - 1  \
-                        or self.rect.top == p.rect.bottom - 1 or self.rect.bottom == p.rect.top + 1:
+                    if self.rect.right == p.rect.left + 1 or self.rect.left == p.rect.right - 1 \
+                            or self.rect.top == p.rect.bottom - 1 or self.rect.bottom == p.rect.top + 1:
 
                         pass
 
@@ -876,6 +880,7 @@ class ExitBlock(Platform):
         # CHANGE pulse time to change width of color band. Change pulse start time to change speed of transition.
         use_color = get_pulse_color([self.color] + self.other_colors, pulse_time=0.5, pulse_start_time=-self.x / 64)
         self.image.fill(Color(*use_color))
+
 
 class FakeExitBlock(Platform):
     def __init__(self, x, y):
@@ -961,7 +966,7 @@ class PlatformHurt(Platform):
 
 class PlatformHurtFull(PlatformHurt):
     def __init__(self, x, y):
-        self.color = RED            
+        self.color = RED
         self.other_color = DARKERRED
         Entity.__init__(self)
         self.image = Surface((32, 32))
@@ -970,6 +975,7 @@ class PlatformHurtFull(PlatformHurt):
         self.rect = Rect(x, y, 32, 32)
         self.x = x
         self.y = y
+
 
 class PlatformPit(Platform):
     def __init__(self, x, y):
@@ -1002,6 +1008,7 @@ class PlatformLife(Platform):
         use_color = get_pulse_color([self.color, self.other_color], pulse_time=2.0)
         self.image.fill(Color(*use_color))
 
+
 class PlatformSticky(Platform):
     def __init__(self, x, y):
         extra = 1
@@ -1028,7 +1035,7 @@ class Platformmovingcarpetleft(Platform):
     def update(self, camera_x, camera_y):
         self.rect.x = self.x - camera_x
         self.rect.y = self.y - camera_y
-        #CHANGE pulse time to change width of color band. Change pulse start time to change speed of transition.
+        # CHANGE pulse time to change width of color band. Change pulse start time to change speed of transition.
         use_color = get_pulse_color([self.color, LIGHTGRAY], pulse_time=2.0, pulse_start_time=-self.x / 256.0)
         self.image.fill(Color(*use_color))
 
@@ -1082,11 +1089,11 @@ def end_message(message_life, message_big, message_small, timer, screen, bg, num
 def draw_big_message(message, color=BLUE, pulse_time=8.0, height=HALF_HEIGHT - 25):
     use_color = get_pulse_color([color, GREEN], pulse_time=pulse_time)
 
-    proposed_size = 50*28/len(message)
+    proposed_size = 50 * 28 / len(message)
     font_size = min(50, proposed_size)
 
     if message is not None:
-        font = pygame.font.Font('freesansbold.ttf', font_size)
+        font = pygame.font.Font('freesansbold.ttf', int(font_size))
         surf = font.render(message, True, use_color)
         rect = surf.get_rect()
         rect.midtop = (HALF_WIDTH, height)
@@ -1109,7 +1116,7 @@ def draw_hp(num_hp):
     use_color = get_pulse_color([LIMEGREEN, DARKGREEN], pulse_time=pulse_time)
 
     for ii in range(num_hp):
-        pygame.draw.rect(DISPLAYSURF, use_color, (3*DEPTH + ii * (DEPTH/2+2), DEPTH/4, DEPTH/2, DEPTH/2))
+        pygame.draw.rect(DISPLAYSURF, use_color, (3 * DEPTH + ii * (DEPTH / 2 + 2), DEPTH / 4, DEPTH / 2, DEPTH / 2))
 
 
 def die_message(message_die, screen, timer, bg):
@@ -1168,16 +1175,16 @@ def instructions_message():
                             ]
     message_small_2 = ["Press spacebar to continue",
                        "Good luck to you!",
-                      ]
+                       ]
 
     time_to_exit = False
     while not time_to_exit:
         TIMER.tick(60)
         DISPLAYSURF.fill(0x000000)
-        
-        draw_big_message(message_big, color=GOLD, pulse_time=2.0, height=WIN_HEIGHT/4)
-        draw_small_message(message_instructions, color=DARKRED, start_height=WIN_HEIGHT/4 + 100)
-        draw_small_message(message_small_2, start_height=WIN_HEIGHT/2 + 100)
+
+        draw_big_message(message_big, color=GOLD, pulse_time=2.0, height=WIN_HEIGHT / 4)
+        draw_small_message(message_instructions, color=DARKRED, start_height=WIN_HEIGHT / 4 + 100)
+        draw_small_message(message_small_2, start_height=WIN_HEIGHT / 2 + 100)
 
         for e in pygame.event.get():
             if e.type == KEYDOWN and e.key == K_ESCAPE:
@@ -1236,31 +1243,31 @@ def draw_prompt_message(message_prompt, color=BLUE, pulse_time=8.0):
         DISPLAYSURF.blit(surf, rect)
 
 
-def draw_small_message(message_list, color=BLUE, pulse_time=8.0, start_height=HALF_HEIGHT + 50, font_size = 25):
+def draw_small_message(message_list, color=BLUE, pulse_time=8.0, start_height=HALF_HEIGHT + 50, font_size=25):
     use_color = get_pulse_color([color, GREEN], pulse_time=pulse_time)
 
     for m, message in enumerate(message_list):
         if message is not None:
-            font = pygame.font.Font('freesansbold.ttf', font_size)
+            font = pygame.font.Font('freesansbold.ttf', int(font_size))
             surf = font.render(message, True, use_color)
             rect = surf.get_rect()
-            rect.midtop = (HALF_WIDTH, start_height + (m * font_size))
+            rect.midtop = (HALF_WIDTH, start_height + (m * int(font_size)))
             DISPLAYSURF.blit(surf, rect)
 
 
 def get_pulse_color(colors, pulse_time=2.0, pulse_start_time=0.0):
     num_colors = len(colors)
-    one_color_time = pulse_time/num_colors
+    one_color_time = pulse_time / num_colors
 
     mod_time = ((current_time() - pulse_start_time) % pulse_time)
-    norm_time = mod_time/one_color_time
+    norm_time = mod_time / one_color_time
     ix1 = int(norm_time)
-    ix2 = (ix1+1) % num_colors
+    ix2 = (ix1 + 1) % num_colors
     fraction = norm_time - ix1
 
     use_color = list(colors[0])
     for ii in range(3):
-        use_color[ii] = int((1.0-fraction) * float(colors[ix1][ii]) + fraction * float(colors[ix2][ii]))
+        use_color[ii] = int((1.0 - fraction) * float(colors[ix1][ii]) + fraction * float(colors[ix2][ii]))
 
     use_color = tuple(use_color)
     return use_color
@@ -1299,8 +1306,8 @@ def level_pack_choice_screen():
 
     while True:
         DISPLAYSURF.fill(0x000000)
-        draw_big_message('Which level pack?', height=WIN_HEIGHT/4)
-        draw_small_message(level_choice_messages, start_height=WIN_HEIGHT/2)
+        draw_big_message('Which level pack?', height=WIN_HEIGHT / 4)
+        draw_small_message(level_choice_messages, start_height=WIN_HEIGHT / 2)
 
         #
         pygame.display.update()
@@ -1318,7 +1325,6 @@ def level_pack_choice_screen():
             elif key == K_5:
                 return levels_cora.levels
 
-
         TIMER.tick(60)
 
 
@@ -1328,11 +1334,11 @@ def level_num_choice_screen(levels):
     pygame.event.get()  # clear out event queue
     num_levels = len(levels)
 
-    level_names = ['{}: {}'.format(ii+1, l.name) for ii, l in enumerate(levels)]
+    level_names = ['{}: {}'.format(ii + 1, l.name) for ii, l in enumerate(levels)]
     level_names = ['Enter number and hit return', ''] + level_names
 
     entered_number_string = ''
-    small_font_size = min(25, int(25 * 17/num_levels))  # Shrink the font as needed so they fit.
+    small_font_size = min(25, int(25 * 17 / num_levels))  # Shrink the font as needed so they fit.
     while True:
         DISPLAYSURF.fill(0x000000)
         draw_big_message('Which level in the pack?', height=HALF_HEIGHT / 5)
@@ -1351,13 +1357,14 @@ def level_num_choice_screen(levels):
                     level_choice = 1
                 else:
                     level_choice = int(entered_number_string)
-                    
+
                 if 1 <= level_choice <= num_levels:
-                    return level_choice-1
+                    return level_choice - 1
                 else:
                     entered_number_string = ''
 
         TIMER.tick(60)
+
 
 if __name__ == "__main__":
     main()
